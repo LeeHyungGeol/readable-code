@@ -1,5 +1,6 @@
 package cleancode.minesweeper.tobe;
 
+import cleancode.minesweeper.tobe.gamelevel.GameLevel;
 import cleancode.minesweeper.tobe.io.ConsoleInputHandler;
 import cleancode.minesweeper.tobe.io.ConsoleOutputHandler;
 
@@ -8,20 +9,22 @@ import java.util.Random;
 import java.util.Scanner;
 
 public class Minesweeper {
-	public static final Scanner SCANNER = new Scanner(System.in);
-	public static final int BOARD_ROW_SIZE = 8;
-	public static final int BOARD_COL_SIZE = 10;
-	public static final int LAND_MINE_COUNT = 10;
 
 	// BOARD 도 하는 일이 너무 많고 중요하기 때문에 Minesweeper 클래스 내부에 상수로 두기에는 너무 책임이 과도하다.
 	// 이렇게 GameBoard 클래스를 두면 Minesweeper 입장에서는 Cell[][] 이중배열에 대해서는 모른다.
 	// 객체로 추상화가 되었고, 데이터 구조에 대한 것은 캐슐화가 되었기 때문이다.
-	private static final GameBoard gameBoard = new GameBoard(BOARD_ROW_SIZE, BOARD_COL_SIZE);
+	private final GameBoard gameBoard;
+	// SRP: cellInput 이라는 사용자의 입력을 받아서 rowIndex, colIndex 로 변환하는 역할을 하는 또 하나의 클래스로 볼 수 있지 않을까?
+	private final BoardIndexConverter boardIndexConverter = new BoardIndexConverter();
 
 	// 게임이 진행되는 핵심 로직들과 사용자 입출력에 대한 로직 책임을 분리한다.
 	private final ConsoleInputHandler consoleInputHandler = new ConsoleInputHandler();
 	private final ConsoleOutputHandler consoleOutputHandler = new ConsoleOutputHandler();
 	private int gameStatus = 0; // 0: 게임 중, 1: 승리, -1: 패배
+
+	public Minesweeper(GameLevel gameLevel) {
+		gameBoard = new GameBoard(gameLevel);
+	}
 
 	public void run() {
 		consoleOutputHandler.showGameStartComments();
@@ -53,8 +56,8 @@ public class Minesweeper {
 	}
 
 	private void actOnCell(String cellInput, String userActionInput) {
-		int selectedColumnIndex = getSelectedColIndex(cellInput);
-		int selectedRowIndex = getSelectedRowIndex(cellInput);
+		int selectedColumnIndex = boardIndexConverter.getSelectedColIndex(cellInput, gameBoard.getColSize());
+		int selectedRowIndex = boardIndexConverter.getSelectedRowIndex(cellInput, gameBoard.getRowSize());
 
 		if (doesUserChooseToPlantFlag(userActionInput)) {
 			gameBoard.flag(selectedRowIndex, selectedColumnIndex);
@@ -88,16 +91,6 @@ public class Minesweeper {
 		return userActionInput.equals("2");
 	}
 
-	private int getSelectedRowIndex(String cellInput) {
-		char cellInputRow = cellInput.charAt(1);
-		return convertRowFrom(cellInputRow);
-	}
-
-	private int getSelectedColIndex(String cellInput) {
-		char cellInputCol = cellInput.charAt(0);
-		return convertColFrom(cellInputCol);
-	}
-
 	private String getUserActionInputFromUser() {
 		consoleOutputHandler.printCommentForUserAction();
 		return consoleInputHandler.getUserInput();
@@ -124,42 +117,5 @@ public class Minesweeper {
 
 	private void changeGameStatusToWin() {
 		gameStatus = 1;
-	}
-
-
-	private int convertRowFrom(char cellInputRow) {
-		int rowIndex = Character.getNumericValue(cellInputRow) - 1;
-		if (rowIndex >= BOARD_ROW_SIZE) {
-			throw new GameException("잘못된 입력입니다.");
-		}
-
-		return rowIndex;
-	}
-
-	private int convertColFrom(char cellInputCol) {
-		switch (cellInputCol) {
-			case 'a':
-				return 0;
-			case 'b':
-				return 1;
-			case 'c':
-				return 2;
-			case 'd':
-				return 3;
-			case 'e':
-				return 4;
-			case 'f':
-				return 5;
-			case 'g':
-				return 6;
-			case 'h':
-				return 7;
-			case 'i':
-				return 8;
-			case 'j':
-				return 9;
-			default:
-				throw new GameException("잘못된 입력입니다.");
-		}
 	}
 }

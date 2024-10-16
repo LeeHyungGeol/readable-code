@@ -1,14 +1,12 @@
 package cleancode.minesweeper.tobe;
 
+import cleancode.minesweeper.tobe.game.GameInitializable;
+import cleancode.minesweeper.tobe.game.GameRunnable;
 import cleancode.minesweeper.tobe.gamelevel.GameLevel;
 import cleancode.minesweeper.tobe.io.ConsoleInputHandler;
 import cleancode.minesweeper.tobe.io.ConsoleOutputHandler;
 
-import java.util.Arrays;
-import java.util.Random;
-import java.util.Scanner;
-
-public class Minesweeper {
+public class Minesweeper implements GameInitializable, GameRunnable {
 
 	// BOARD 도 하는 일이 너무 많고 중요하기 때문에 Minesweeper 클래스 내부에 상수로 두기에는 너무 책임이 과도하다.
 	// 이렇게 GameBoard 클래스를 두면 Minesweeper 입장에서는 Cell[][] 이중배열에 대해서는 모른다.
@@ -26,9 +24,14 @@ public class Minesweeper {
 		gameBoard = new GameBoard(gameLevel);
 	}
 
+	@Override
+	public void initialize() {
+		gameBoard.initializeGame();
+	}
+
+	@Override
 	public void run() {
 		consoleOutputHandler.showGameStartComments();
-		gameBoard.initializeGame();
 		while (true) {
 			try {
 				consoleOutputHandler.showBoard(gameBoard);

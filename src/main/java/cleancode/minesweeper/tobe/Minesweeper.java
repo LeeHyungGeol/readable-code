@@ -3,8 +3,8 @@ package cleancode.minesweeper.tobe;
 import cleancode.minesweeper.tobe.game.GameInitializable;
 import cleancode.minesweeper.tobe.game.GameRunnable;
 import cleancode.minesweeper.tobe.gamelevel.GameLevel;
-import cleancode.minesweeper.tobe.io.ConsoleInputHandler;
-import cleancode.minesweeper.tobe.io.ConsoleOutputHandler;
+import cleancode.minesweeper.tobe.io.InputHandler;
+import cleancode.minesweeper.tobe.io.OutputHandler;
 
 public class Minesweeper implements GameInitializable, GameRunnable {
 
@@ -16,12 +16,16 @@ public class Minesweeper implements GameInitializable, GameRunnable {
 	private final BoardIndexConverter boardIndexConverter = new BoardIndexConverter();
 
 	// 게임이 진행되는 핵심 로직들과 사용자 입출력에 대한 로직 책임을 분리한다.
-	private final ConsoleInputHandler consoleInputHandler = new ConsoleInputHandler();
-	private final ConsoleOutputHandler consoleOutputHandler = new ConsoleOutputHandler();
+	// DIP: InputHandler, OutputHandler 는 이제 Console 에 관한 것은 모른다. 인터페이스만 의존하고 있다.
+	// 구현체가 변경되어도 Minesweeper 클래스는 영향을 받지 않는다.
+	private final InputHandler inputHandler;
+	private final OutputHandler outputHandler;
 	private int gameStatus = 0; // 0: 게임 중, 1: 승리, -1: 패배
 
-	public Minesweeper(GameLevel gameLevel) {
+	public Minesweeper(GameLevel gameLevel, InputHandler inputHandler, OutputHandler outputHandler) {
 		gameBoard = new GameBoard(gameLevel);
+		this.inputHandler = inputHandler;
+		this.outputHandler = outputHandler;
 	}
 
 	@Override
@@ -31,17 +35,17 @@ public class Minesweeper implements GameInitializable, GameRunnable {
 
 	@Override
 	public void run() {
-		consoleOutputHandler.showGameStartComments();
+		outputHandler.showGameStartComments();
 		while (true) {
 			try {
-				consoleOutputHandler.showBoard(gameBoard);
+				outputHandler.showBoard(gameBoard);
 
 				if (doesUserWinTheGame()) {
-					consoleOutputHandler.printGameWinningComment();
+					outputHandler.showPrintGameWinningComment();
 					break;
 				}
 				if (doesUserLoseTheGame()) {
-					consoleOutputHandler.printGameLosingComment();
+					outputHandler.showGameLosingComment();
 					break;
 				}
 				String cellInput = getCellInputFromUser();
@@ -51,9 +55,9 @@ public class Minesweeper implements GameInitializable, GameRunnable {
 				// print 할 때 AppException 에서 어떤걸 꺼내서 쓸지는 내부에서 알아서 결정할 것이고,
 				// 예외 상황(exception 에 대한 메시지)에 대한 메시지를 출력하겠다는 이 메서드명을 봤을 때
 				// 파라미터는 exception 자체를 넣어주는 것이 더 자연스럽지 않을까 한다.
-				consoleOutputHandler.printExceptionMessage(e);
+				outputHandler.showExceptionMessage(e);
 			} catch (Exception e) {
-				consoleOutputHandler.printSimpleMessage("프로그램에 문제가 생겼습니다.");
+				outputHandler.showSimpleMessage("프로그램에 문제가 생겼습니다.");
 			}
 		}
 	}
@@ -95,13 +99,13 @@ public class Minesweeper implements GameInitializable, GameRunnable {
 	}
 
 	private String getUserActionInputFromUser() {
-		consoleOutputHandler.printCommentForUserAction();
-		return consoleInputHandler.getUserInput();
+		outputHandler.showCommentForUserAction();
+		return inputHandler.getUserInput();
 	}
 
 	private String getCellInputFromUser() {
-		consoleOutputHandler.printCommentForSelectingCell();
-		return consoleInputHandler.getUserInput();
+		outputHandler.showCommentForSelectingCell();
+		return inputHandler.getUserInput();
 	}
 
 	private boolean doesUserLoseTheGame() {

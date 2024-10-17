@@ -3,6 +3,9 @@ package cleancode.minesweeper.tobe;
 import cleancode.minesweeper.tobe.gamelevel.Advanced;
 import cleancode.minesweeper.tobe.gamelevel.GameLevel;
 import cleancode.minesweeper.tobe.gamelevel.Middle;
+import cleancode.minesweeper.tobe.io.ConsoleInputHandler;
+import cleancode.minesweeper.tobe.io.ConsoleOutputHandler;
+import cleancode.minesweeper.tobe.io.InputHandler;
 
 public class GameApplication {
 
@@ -11,7 +14,10 @@ public class GameApplication {
     // 게임 실행에 대한 책임과 지뢰찾기 도메인 자체, 지뢰찾기 게임을 담당하는 역할을 분리했다.
     public static void main(String[] args) {
         GameLevel gameLevel = new Middle();
-        Minesweeper minesweeper = new Minesweeper(gameLevel);
+        InputHandler inputHandler = new ConsoleInputHandler();
+        ConsoleOutputHandler outputHandler = new ConsoleOutputHandler();
+
+        Minesweeper minesweeper = new Minesweeper(gameLevel, inputHandler, outputHandler);
         minesweeper.initialize();
         minesweeper.run();
     }

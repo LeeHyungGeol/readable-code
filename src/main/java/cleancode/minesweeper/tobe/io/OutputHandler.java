@@ -14,7 +14,7 @@ public interface OutputHandler {
 	void showBoard(GameBoard board);
 
 
-	void showPrintGameWinningComment();
+	void showGameWinningComment();
 
 	void showGameLosingComment();
 

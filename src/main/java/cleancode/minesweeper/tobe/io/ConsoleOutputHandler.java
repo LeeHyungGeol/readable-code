@@ -40,7 +40,7 @@ public class ConsoleOutputHandler implements OutputHandler {
 	}
 
 	@Override
-	public void showPrintGameWinningComment() {
+	public void showGameWinningComment() {
 		System.out.println("지뢰를 모두 찾았습니다. GAME CLEAR!");
 	}
 

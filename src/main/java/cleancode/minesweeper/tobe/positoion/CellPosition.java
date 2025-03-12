@@ -19,10 +19,10 @@ public class CellPosition {
 	}
 
 	@Override
-	public boolean equals(Object object) {
-		if (this == object) return true;
-		if (object == null || getClass() != object.getClass()) return false;
-		CellPosition that = (CellPosition) object;
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		CellPosition that = (CellPosition) o;
 		return rowIndex == that.rowIndex && colIndex == that.colIndex;
 	}
 
@@ -40,16 +40,16 @@ public class CellPosition {
 	}
 
 	public int getRowIndex() {
-		return this.rowIndex;
+		return rowIndex;
 	}
 
 	public int getColIndex() {
-		return this.colIndex;
+		return colIndex;
 	}
 
 	public boolean canCalculatePositionBy(RelativePosition relativePosition) {
-		return this.getRowIndex() + relativePosition.getDeltaRow() >= 0
-			&& this.getColIndex() + relativePosition.getDeltaCol() >= 0;
+		return this.rowIndex + relativePosition.getDeltaRow() >= 0
+			&& this.colIndex + relativePosition.getDeltaCol() >= 0;
 	}
 
 	public CellPosition calculatePositionBy(RelativePosition relativePosition) {
@@ -59,7 +59,7 @@ public class CellPosition {
 				this.colIndex + relativePosition.getDeltaCol()
 			);
 		}
-		throw new IllegalArgumentException("움직일 수 없는 좌표입니다.");
+		throw new IllegalArgumentException("움직일 수 있는 좌표가 아닙니다.");
 	}
 
 	public boolean isRowIndexLessThan(int rowIndex) {
@@ -69,4 +69,5 @@ public class CellPosition {
 	public boolean isColIndexLessThan(int colIndex) {
 		return this.colIndex < colIndex;
 	}
+
 }

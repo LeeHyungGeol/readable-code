@@ -36,25 +36,24 @@ public class Minesweeper implements GameInitializable, GameRunnable {
 	@Override
 	public void run() {
 		outputHandler.showGameStartComments();
+
 		while (true) {
 			try {
 				outputHandler.showBoard(gameBoard);
 
 				if (doesUserWinTheGame()) {
-					outputHandler.showPrintGameWinningComment();
+					outputHandler.showGameWinningComment();
 					break;
 				}
 				if (doesUserLoseTheGame()) {
 					outputHandler.showGameLosingComment();
 					break;
 				}
+
 				CellPosition cellPosition = getCellInputFromUser();
 				String userActionInput = getUserActionInputFromUser();
 				actOnCell(cellPosition, userActionInput);
 			} catch (GameException e) {
-				// print 할 때 AppException 에서 어떤걸 꺼내서 쓸지는 내부에서 알아서 결정할 것이고,
-				// 예외 상황(exception 에 대한 메시지)에 대한 메시지를 출력하겠다는 이 메서드명을 봤을 때
-				// 파라미터는 exception 자체를 넣어주는 것이 더 자연스럽지 않을까 한다.
 				outputHandler.showExceptionMessage(e);
 			} catch (Exception e) {
 				outputHandler.showSimpleMessage("프로그램에 문제가 생겼습니다.");
@@ -103,7 +102,7 @@ public class Minesweeper implements GameInitializable, GameRunnable {
 	private CellPosition getCellInputFromUser() {
 		outputHandler.showCommentForSelectingCell();
 		CellPosition cellPosition = inputHandler.getCellPositionFromUser();
-		if (gameBoard.isInValidCellPosition(cellPosition)) {
+		if (gameBoard.isInvalidCellPosition(cellPosition)) {
 			throw new GameException("잘못된 좌표를 선택하셨습니다.");
 		}
 
@@ -127,4 +126,5 @@ public class Minesweeper implements GameInitializable, GameRunnable {
 	private void changeGameStatusToWin() {
 		gameStatus = 1;
 	}
+
 }

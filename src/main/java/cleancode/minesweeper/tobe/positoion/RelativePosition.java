@@ -4,10 +4,11 @@ import java.util.List;
 import java.util.Objects;
 
 public class RelativePosition {
+
 	public static final List<RelativePosition> SURROUNDED_POSITIONS = List.of(
 		RelativePosition.of(-1, -1),
 		RelativePosition.of(-1, 0),
-		RelativePosition.of(-1, -1),
+		RelativePosition.of(-1, 1),
 		RelativePosition.of(0, -1),
 		RelativePosition.of(0, 1),
 		RelativePosition.of(1, -1),
@@ -28,10 +29,10 @@ public class RelativePosition {
 	}
 
 	@Override
-	public boolean equals(Object object) {
-		if (this == object) return true;
-		if (object == null || getClass() != object.getClass()) return false;
-		RelativePosition that = (RelativePosition) object;
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		RelativePosition that = (RelativePosition) o;
 		return deltaRow == that.deltaRow && deltaCol == that.deltaCol;
 	}
 
@@ -41,10 +42,11 @@ public class RelativePosition {
 	}
 
 	public int getDeltaRow() {
-		return this.deltaRow;
+		return deltaRow;
 	}
 
 	public int getDeltaCol() {
-		return this.deltaCol;
+		return deltaCol;
 	}
+
 }

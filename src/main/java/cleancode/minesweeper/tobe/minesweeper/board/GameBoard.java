@@ -31,8 +31,6 @@ public class GameBoard {
 		initializeGameStatus();
 	}
 
-	// public
-	// 상태 변경
 	public void initializeGame() {
 		initializeGameStatus();
 		CellPositions cellPositions = CellPositions.from(board);
@@ -53,7 +51,8 @@ public class GameBoard {
 			return;
 		}
 
-		openSurroundedCells(cellPosition);
+//        openSurroundedCells(cellPosition);
+		openSurroundedCells2(cellPosition);
 		checkIfGameIsOver();
 	}
 
@@ -64,7 +63,6 @@ public class GameBoard {
 		checkIfGameIsOver();
 	}
 
-	// 판별
 	public boolean isInvalidCellPosition(CellPosition cellPosition) {
 		int rowSize = getRowSize();
 		int colSize = getColSize();
@@ -73,12 +71,18 @@ public class GameBoard {
 			|| cellPosition.isColIndexMoreThanOrEqual(colSize);
 	}
 
-	public boolean inInProgress() {
+	public boolean isInProgress() {
 		return gameStatus == GameStatus.IN_PROGRESS;
 	}
 
+	public boolean isWinStatus() {
+		return gameStatus == GameStatus.WIN;
+	}
 
-	// 조회
+	public boolean isLoseStatus() {
+		return gameStatus == GameStatus.LOSE;
+	}
+
 	public CellSnapshot getSnapshot(CellPosition cellPosition) {
 		Cell cell = findCell(cellPosition);
 		return cell.getSnapshot();
@@ -91,17 +95,6 @@ public class GameBoard {
 	public int getColSize() {
 		return board[0].length;
 	}
-
-	public boolean isWinStatus() {
-		return gameStatus == GameStatus.WIN;
-	}
-
-	public boolean isLoseStatus() {
-		return gameStatus == GameStatus.LOSE;
-	}
-
-
-	// private
 
 	private void initializeGameStatus() {
 		gameStatus = GameStatus.IN_PROGRESS;
@@ -154,6 +147,24 @@ public class GameBoard {
 	}
 
 	private void openSurroundedCells(CellPosition cellPosition) {
+		if (isOpenedCell(cellPosition)) {
+			return;
+		}
+		if (isLandMineCellAt(cellPosition)) {
+			return;
+		}
+
+		openOneCellAt(cellPosition);
+
+		if (doesCellHaveLandMineCount(cellPosition)) {
+			return;
+		}
+
+		List<CellPosition> surroundedPositions = calculateSurroundedPositions(cellPosition, getRowSize(), getColSize());
+		surroundedPositions.forEach(this::openSurroundedCells);
+	}
+
+	private void openSurroundedCells2(CellPosition cellPosition) {
 		Deque<CellPosition> deque = new ArrayDeque<>();
 		deque.push(cellPosition);
 
@@ -162,9 +173,8 @@ public class GameBoard {
 		}
 	}
 
-	private void openAndPushCellAt(Deque<CellPosition> stack) {
-		CellPosition currentCellPosition = stack.pop();
-
+	private void openAndPushCellAt(Deque<CellPosition> deque) {
+		CellPosition currentCellPosition = deque.pop();
 		if (isOpenedCell(currentCellPosition)) {
 			return;
 		}
@@ -180,7 +190,7 @@ public class GameBoard {
 
 		List<CellPosition> surroundedPositions = calculateSurroundedPositions(currentCellPosition, getRowSize(), getColSize());
 		for (CellPosition surroundedPosition : surroundedPositions) {
-			stack.push(surroundedPosition);
+			deque.push(surroundedPosition);
 		}
 	}
 
@@ -226,4 +236,5 @@ public class GameBoard {
 	private Cell findCell(CellPosition cellPosition) {
 		return board[cellPosition.getRowIndex()][cellPosition.getColIndex()];
 	}
+
 }

@@ -39,7 +39,7 @@ public class Minesweeper implements GameInitializable, GameRunnable {
 	public void run() {
 		outputHandler.showGameStartComments();
 
-		while (gameBoard.inInProgress()) {
+		while (gameBoard.isInProgress()) {
 			try {
 				outputHandler.showBoard(gameBoard);
 
